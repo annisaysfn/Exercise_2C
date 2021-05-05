@@ -1,23 +1,32 @@
 package com.example.kelascsqlite.adapter;
 
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
+import android.widget.PopupMenu;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.kelascsqlite.MainActivity;
 import com.example.kelascsqlite.R;
+import com.example.kelascsqlite.UpdateTeman;
+import com.example.kelascsqlite.database.DBController;
 import com.example.kelascsqlite.database.teman;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class TemanAdapter extends RecyclerView.Adapter<TemanAdapter.TemanViewHolder> {
     private ArrayList<teman> listData;
+    private Context context;
 
     public TemanAdapter(ArrayList<teman> listData) {
         this.listData = listData;
@@ -25,6 +34,7 @@ public class TemanAdapter extends RecyclerView.Adapter<TemanAdapter.TemanViewHol
 
     @Override
     public TemanViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        context = parent.getContext();
         LayoutInflater layoutInf = LayoutInflater.from(parent.getContext());
         View view = layoutInf.inflate(R.layout.row_data_teman,parent,false);
         return new TemanViewHolder(view);
@@ -32,15 +42,54 @@ public class TemanAdapter extends RecyclerView.Adapter<TemanAdapter.TemanViewHol
 
     @Override
     public void onBindViewHolder(@NonNull TemanViewHolder holder, int position) {
-        String nm,tlp;
+        String id, nm, tlp;
 
+        id = listData.get(position).getId();
         nm = listData.get(position).getNama();
         tlp = listData.get(position).getTelpon();
+        DBController controller = new DBController(context);
 
         holder.namaTxt.setTextColor(Color.BLUE);
         holder.namaTxt.setTextSize(20);
         holder.namaTxt.setText(nm);
         holder.telponTxt.setText(tlp);
+
+        holder.cardku.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                PopupMenu pop_up = new PopupMenu(context, holder.cardku);
+                pop_up.inflate(R.menu.popupmenu);
+                pop_up.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        switch (item.getItemId()){
+                            case R.id.lihat:
+                                Toast.makeText(context.getApplicationContext(), "Nama Teman: "+nm+
+                                        "\nNomor Telepon: "+tlp, Toast.LENGTH_SHORT).show();
+                                break;
+                            case R.id.edit:
+                                Intent i = new Intent(context, UpdateTeman.class);
+                                i.putExtra("id", id);
+                                i.putExtra("nm", nm);
+                                i.putExtra("tlp", tlp);
+                                context.startActivity(i);
+                                break;
+                            case R.id.hapus:
+                                HashMap<String,String> qvalues = new HashMap<>();
+                                qvalues.put("id", id);
+                                controller.deleteData(qvalues);
+                                Toast.makeText(context.getApplicationContext(), "Data Berhasil Dihapus", Toast.LENGTH_LONG).show();
+                                Intent intent = new Intent(context, MainActivity.class);
+                                context.startActivity(intent);
+                                break;
+                        }
+                        return true;
+                    }
+                });
+                pop_up.show();
+                return true;
+            }
+        });
     }
 
     @Override
@@ -56,14 +105,6 @@ public class TemanAdapter extends RecyclerView.Adapter<TemanAdapter.TemanViewHol
             cardku = (CardView) view.findViewById(R.id.kartuku);
             namaTxt = (TextView) view.findViewById(R.id.textNama);
             telponTxt = (TextView) view.findViewById(R.id.textTelpon);
-
-            cardku.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-
-                    return true;
-                }
-            });
         }
     }
 }

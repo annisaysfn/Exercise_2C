@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">KelasCSQLite</string>
+    <string name="nama">Nama</string>
+    <string name="notelp">Nomor Telepon</string>
 </resources>

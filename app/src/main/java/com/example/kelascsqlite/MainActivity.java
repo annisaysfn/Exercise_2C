@@ -1,12 +1,19 @@
 package com.example.kelascsqlite;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.ContextMenu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 
 import com.example.kelascsqlite.adapter.TemanAdapter;
 import com.example.kelascsqlite.database.DBController;
@@ -22,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<teman> temanArrayList;
     DBController controller = new DBController(this);
     String id,nm,tlp;
+    CardView kartuku;
     private FloatingActionButton fab;
 
     @Override
@@ -44,6 +52,33 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.popupmenu, menu);
+        menu.setHeaderTitle("Pilih Opsi");
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.edit){
+            Intent intent = new Intent(MainActivity.this, UpdateTeman.class);
+            startActivity(intent);
+            return true;
+        } else if (item.getItemId() ==  R.id.hapus) {
+            HashMap<String, String> qvalues = new HashMap<>();
+            qvalues.put("id", id);
+            controller.deleteData(qvalues);
+            Intent in = new Intent(getApplicationContext(), MainActivity.class);
+            startActivity(in);
+        }else{
+            return false;
+        }
+        return true;
     }
 
     public void BacaData(){

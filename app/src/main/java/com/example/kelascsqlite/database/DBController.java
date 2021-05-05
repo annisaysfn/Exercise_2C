@@ -8,6 +8,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import androidx.annotation.Nullable;
 
+import com.example.kelascsqlite.adapter.TemanAdapter;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -37,6 +39,20 @@ public class DBController extends SQLiteOpenHelper {
         nilai.put("telpon",queryValues.get("telpon"));
         basisdata.insert("teman", null, nilai);
         basisdata.close();
+    }
+
+    public void updateData(HashMap<String,String> queryValues){
+        SQLiteDatabase basisdata = this.getWritableDatabase();
+        ContentValues nilai = new ContentValues();
+        nilai.put("nama",queryValues.get("nama"));
+        nilai.put("telpon",queryValues.get("telpon"));
+        basisdata.update("teman",nilai,"id"+" =?", new String[]{queryValues.get("id")});
+        basisdata.close();
+    }
+
+    public int deleteData(HashMap<String,String> queryValues){
+        SQLiteDatabase basisdata = this.getWritableDatabase();
+        return basisdata.delete("teman","id"+" =?", new String[]{queryValues.get("id")});
     }
 
     public ArrayList<HashMap<String,String>> getAllTeman(){
